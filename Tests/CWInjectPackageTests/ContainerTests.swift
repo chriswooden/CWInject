@@ -15,13 +15,13 @@ class ContainerTests: XCTestCase {
   func test_registerInstance_addsNewAssembly() {
     struct Shared {}
     let container = Container().register(instance: Shared())
-    XCTAssertEqual(container.assemblies.count, 1)
+    XCTAssertEqual(container.factories.count, 1)
   }
 
   func test_registerAssemble_addsNewAssembly() {
     struct Service {}
     let container = Container().register { _ in Service() }
-    XCTAssertEqual(container.assemblies.count, 1)
+    XCTAssertEqual(container.factories.count, 1)
   }
 
   func test_resolve_registeredInstance_resolvesCorrectInstance() {
