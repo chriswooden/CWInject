@@ -9,33 +9,30 @@
 import Foundation
 
 public class Container: Resolver {
-  private var factories: [ServiceFactoryWrapper]
+  private var factories: [ServiceKey: ServiceFactoryWrapper]
   private var resolutionPool: [Any] = []
 
   public init() {
-    factories = []
+    factories = [:]
   }
 
-  private init(factories: [ServiceFactoryWrapper]) {
-    self.factories = factories
+  @discardableResult public func register<T>(_ type: T.Type, id: String? = nil, instance: T) -> Container {
+    register(type, factory: { _ in instance })
   }
 
-  public func register<T>(instance: T) -> Container {
-    register(factory: { _ in instance })
-  }
-
-  @discardableResult public func register<T>(factory: @escaping (Resolver) -> T, initCompleted: ((T, Resolver) -> Void)? = nil) -> Container {
-    assert(!factories.contains(where: { $0.makes(T.self) }))
+  @discardableResult public func register<T>(_ type: T.Type, id: String? = nil, factory: @escaping (Resolver) -> T, initCompleted: ((T, Resolver) -> Void)? = nil) -> Container {
+    let key = ServiceKey(serviceType: type, id: id)
+    assert(factories[key] == nil, "Pre-existing service registration for type, supply a uniqie id to regitser multiple services for the same type")
     let newFactory = ServiceFactory<T>(make: { factory($0) }, made: { initCompleted?($0, $1) })
-    factories.append(newFactory.wrapped)
+    factories[key] = newFactory.wrapped
     return self
   }
 
-  public func resolve<T>(_ type: T.Type) -> T? {
+  public func resolve<T>(_ type: T.Type, id: String? = nil) -> T? {
     if let service = resolutionPool.first(where: { $0 is T }) as? T {
       return service
     }
-    guard let factory = factories.first(where: { $0.makes(type)}) else {
+    guard let factory = factories[ServiceKey(serviceType: type, id: id)] else {
       return nil
     }
     let service = factory.make(resolver: self) as Any

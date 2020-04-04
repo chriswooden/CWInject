@@ -14,14 +14,14 @@ class ContainerTests: XCTestCase {
   func test_resolve_registeredInstance_resolvesCorrectInstance() {
     struct Shared: Equatable {}
     let sharedInstance = Shared()
-    let container = Container().register(instance: sharedInstance)
+    let container = Container().register(Shared.self, instance: sharedInstance)
     XCTAssertEqual(container.resolve(Shared.self), sharedInstance)
   }
 
   func test_resolve_registeredFactory_resolvesCorrectType() {
     struct Service: Equatable {}
     let serviceInstance = Service()
-    let container = Container().register(factory: { _ in Service() }, initCompleted: nil)
+    let container = Container().register(Service.self, factory: { _ in Service() }, initCompleted: nil)
     XCTAssertEqual(container.resolve(Service.self), serviceInstance)
   }
 
@@ -35,12 +35,12 @@ class ContainerTests: XCTestCase {
     let container = Container()
     let parent = Parent()
     let child = Child()
-    container.register(factory: { resolver -> Parent in
+    container.register(Parent.self, factory: { resolver -> Parent in
       parent
     }, initCompleted: { parent, resolver in
       parent.child = resolver.resolve(Child.self)
     })
-    container.register(factory: { _ -> Child in
+    container.register(Child.self, factory: { _ -> Child in
       child
     }, initCompleted: { child, resolver in
       child.parent = resolver.resolve(Parent.self)
@@ -49,6 +49,16 @@ class ContainerTests: XCTestCase {
     let resolvedChild = container.resolve(Child.self)
     XCTAssertEqual(resolvedParent?.child, child)
     XCTAssertEqual(resolvedChild?.parent, parent)
+  }
+
+  func test_resolve_multipleRegistrationsOfType_usesIDToDisambiguate() {
+    struct Service: Equatable {
+      let id: String
+    }
+    let container = Container().register(Service.self, id: "serviceA", factory: { _ in Service(id: "A") }, initCompleted: nil)
+    container.register(Service.self, id: "serviceB", factory: { _ in Service(id: "B") }, initCompleted: nil)
+    XCTAssertEqual(container.resolve(Service.self, id: "serviceA"), Service(id: "A"))
+    XCTAssertEqual(container.resolve(Service.self, id: "serviceB"), Service(id: "B"))
   }
 }
 
