@@ -10,7 +10,8 @@ import Foundation
 
 protocol ServiceFactoryProtocol {
   associatedtype ServiceType
-  func make(_ resolver: Resolver) -> ServiceType
+  func make(resolver: Resolver) -> ServiceType
+  func made(_ service: ServiceType, resolver: Resolver)
 }
 
 extension ServiceFactoryProtocol {
