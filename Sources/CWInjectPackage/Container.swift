@@ -11,11 +11,11 @@ import Foundation
 public struct Container: Resolver {
   let assemblies: [AnyAssembly]
 
-  init() {
+  public init() {
     assemblies = []
   }
 
-  init(assemblies: [AnyAssembly]) {
+  public init(assemblies: [AnyAssembly]) {
     self.assemblies = assemblies
   }
 
@@ -27,7 +27,7 @@ public struct Container: Resolver {
     let type = T.self
     assert(!assemblies.contains(where: { $0.supports(type) }))
     let newAssembly = ConcreteAssembly<T>() { assemble($0) }
-    return .init(assemblies: assemblies + [AnyAssembly(newAssembly)])
+    return .init(assemblies: assemblies + [newAssembly.wrapped])
   }
 
   public func resolve<T>(_ type: T.Type) -> T? {
