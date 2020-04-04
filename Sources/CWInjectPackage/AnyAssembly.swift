@@ -8,7 +8,7 @@
 
 import Foundation
 
-final class AnyAssembly {
+public final class AnyAssembly {
   private let resolve: (Resolver) -> Any
   private let supports: (Any.Type) -> Bool
 

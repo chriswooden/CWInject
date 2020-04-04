@@ -23,10 +23,10 @@ public struct Container: Resolver {
     register() { _ in instance }
   }
 
-  public func register<T>(factory: @escaping (Resolver) -> T) -> Container {
+  public func register<T>(assemble: @escaping (Resolver) -> T) -> Container {
     let type = T.self
     assert(!assemblies.contains(where: { $0.supports(type) }))
-    let newAssembly = ConcreteAssembly<T>(type) { factory($0) }
+    let newAssembly = ConcreteAssembly<T>() { assemble($0) }
     return .init(assemblies: assemblies + [AnyAssembly(newAssembly)])
   }
 

@@ -9,13 +9,13 @@
 import Foundation
 
 struct ConcreteAssembly<AssembledType>: Assembly {
-  private let factory: (Resolver) -> AssembledType
+  private let assemble: (Resolver) -> AssembledType
 
-  init(_ type: AssembledType.Type, factory: @escaping (Resolver) -> AssembledType) {
-    self.factory = factory
+  init(assemble: @escaping (Resolver) -> AssembledType) {
+    self.assemble = assemble
   }
 
   func assemble(_ resolver: Resolver) -> AssembledType {
-    factory(resolver)
+    assemble(resolver)
   }
 }

@@ -17,4 +17,8 @@ extension Assembly {
   func supports<T>(_ type: T.Type) -> Bool {
     type == AssembledType.self
   }
+
+  var wrapped: AnyAssembly {
+    AnyAssembly(self)
+  }
 }

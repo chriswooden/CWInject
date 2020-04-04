@@ -18,7 +18,7 @@ class ContainerTests: XCTestCase {
     XCTAssertEqual(container.assemblies.count, 1)
   }
 
-  func test_registerFactory_addsNewAssembly() {
+  func test_registerAssemble_addsNewAssembly() {
     struct Service {}
     let container = Container().register { _ in Service() }
     XCTAssertEqual(container.assemblies.count, 1)
@@ -31,7 +31,7 @@ class ContainerTests: XCTestCase {
     XCTAssertEqual(container.resolve(Shared.self), sharedInstance)
   }
 
-  func test_resolve_registeredFactory_resolvesCorrectType() {
+  func test_resolve_registeredAssemble_resolvesCorrectType() {
     struct Service: Equatable {}
     let serviceInstance = Service()
     let container = Container().register(instance: serviceInstance)
