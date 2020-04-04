@@ -9,13 +9,13 @@
 import Foundation
 
 public protocol Assembly {
-  associatedtype AssembledType
-  func assemble(_ resolver: Resolver) -> AssembledType
+  associatedtype ResolvedType
+  func resolve(_ resolver: Resolver) -> ResolvedType
 }
 
 extension Assembly {
   func supports<T>(_ type: T.Type) -> Bool {
-    type == AssembledType.self
+    type == ResolvedType.self
   }
 
   var wrapped: AnyAssembly {

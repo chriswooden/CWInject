@@ -15,7 +15,7 @@ public struct Container: Resolver {
     assemblies = []
   }
 
-  public init(assemblies: [AnyAssembly]) {
+  private init(assemblies: [AnyAssembly]) {
     self.assemblies = assemblies
   }
 
@@ -23,10 +23,9 @@ public struct Container: Resolver {
     register() { _ in instance }
   }
 
-  public func register<T>(assemble: @escaping (Resolver) -> T) -> Container {
-    let type = T.self
-    assert(!assemblies.contains(where: { $0.supports(type) }))
-    let newAssembly = ConcreteAssembly<T>() { assemble($0) }
+  public func register<T>(factory: @escaping (Resolver) -> T) -> Container {
+    assert(!assemblies.contains(where: { $0.supports(T.self) }))
+    let newAssembly = ConcreteAssembly<T>() { factory($0) }
     return .init(assemblies: assemblies + [newAssembly.wrapped])
   }
 
