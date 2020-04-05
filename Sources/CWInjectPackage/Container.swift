@@ -10,7 +10,7 @@ import Foundation
 
 public class Container: Resolver {
   private var factories: [ServiceKey: ServiceFactoryWrapper]
-  private var resolutionPool: [Any] = []
+  private var resolutionPool: [ServiceKey: Any] = [:]
 
   public init() {
     factories = [:]
@@ -29,17 +29,17 @@ public class Container: Resolver {
   }
 
   public func resolve<T>(_ type: T.Type, id: String? = nil) -> T {
-    if let service = resolutionPool.first(where: { $0 is T }) as? T {
+    let key = ServiceKey(serviceType: type, id: id)
+    if let service = resolutionPool[key] as? T {
       return service
     }
     guard let factory = factories[ServiceKey(serviceType: type, id: id)] else {
       assert(false, "Cannot resolve dependency of type: \(T.self), id: \(String(describing: id)). Ensure a registration exists")
     }
     let service = factory.make(resolver: self) as Any
-    resolutionPool.append(service)
-    let index = resolutionPool.count - 1
+    resolutionPool[key] = service
     factory.made(service, resolver: self)
-    resolutionPool.remove(at: index)
+    resolutionPool.removeValue(forKey: key)
     return service as! T
   }
 }

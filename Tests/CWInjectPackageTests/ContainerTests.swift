@@ -25,7 +25,7 @@ class ContainerTests: XCTestCase {
     XCTAssertEqual(container.resolve(Service.self), serviceInstance)
   }
 
-  func test_resolve_circularDependencies_usesInitCompleted() {
+  func test_resolve_propertyToPropertyInjection_resolvesBothDependencies() {
     let container = Container()
     let parent = Parent()
     let child = Child()
