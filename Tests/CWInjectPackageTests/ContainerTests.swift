@@ -25,12 +25,6 @@ class ContainerTests: XCTestCase {
     XCTAssertEqual(container.resolve(Service.self), serviceInstance)
   }
 
-  func test_resolve_noRegistration_returnsNil() {
-    struct Service {}
-    let container = Container()
-    XCTAssertNil(container.resolve(Service.self))
-  }
-
   func test_resolve_circularDependencies_usesInitCompleted() {
     let container = Container()
     let parent = Parent()
@@ -47,8 +41,8 @@ class ContainerTests: XCTestCase {
     })
     let resolvedParent = container.resolve(Parent.self)
     let resolvedChild = container.resolve(Child.self)
-    XCTAssertEqual(resolvedParent?.child, child)
-    XCTAssertEqual(resolvedChild?.parent, parent)
+    XCTAssertEqual(resolvedParent.child, child)
+    XCTAssertEqual(resolvedChild.parent, parent)
   }
 
   func test_resolve_multipleRegistrationsOfType_usesIDToDisambiguate() {
