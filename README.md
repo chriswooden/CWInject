@@ -100,7 +100,7 @@ class Dog: Animal {
 
 ## Circular Dependencies
 
-_Circular dependencies_ are dependencies of instances that depend on each other. To define circular dependencies in CWInject, both of the dependencies must be injected through a property.
+_Circular dependencies_ are dependencies of instances that depend on each other. To define circular dependencies in CWInject, one of the dependencies must be injected through a property.
 
 ### Initializer/Property Dependencies
 
@@ -114,7 +114,7 @@ class Parent: ParentProtocol {
   let child: ChildProtocol?
 
   init(child: ChildProtocol?) {
-      self.child = child
+    self.child = child
   }
 }
 
