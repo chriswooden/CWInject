@@ -10,7 +10,7 @@ import Foundation
 
 public class Container: Resolver {
   private var factories: [ServiceKey: ServiceFactoryWrapper]
-  private var resolutionPool: [ServiceKey: Any] = [:]
+  private var resolutionPool = ResolutionPool()
 
   public init() {
     factories = [:]
@@ -30,16 +30,41 @@ public class Container: Resolver {
 
   public func resolve<T>(_ type: T.Type, id: String? = nil) -> T {
     let key = ServiceKey(serviceType: type, id: id)
-    if let service = resolutionPool[key] as? T {
-      return service
-    }
     guard let factory = factories[ServiceKey(serviceType: type, id: id)] else {
       assert(false, "Cannot resolve dependency of type: \(T.self), id: \(String(describing: id)). Ensure a registration exists")
     }
-    let service = factory.make(resolver: self) as Any
-    resolutionPool[key] = service
-    factory.made(service, resolver: self)
-    resolutionPool.removeValue(forKey: key)
-    return service as! T
+    return resolve(key: key, factory: factory)
+  }
+
+  private func resolve<T>(key: ServiceKey, factory: ServiceFactoryWrapper) -> T {
+    return resolutionPool.resolve { () -> T in
+      if let previouslyResolved = resolutionPool.resolved[key] as? T {
+        return previouslyResolved
+      } else {
+        let resolvedService = factory.make(resolver: self) as Any
+        if let previouslyResolved = resolutionPool.resolved[key] as? T {
+          return previouslyResolved
+        }
+        resolutionPool.resolved[key] = resolvedService
+        factory.made(resolvedService, resolver: self)
+        return resolvedService as! T
+      }
+    }
+  }
+}
+
+private class ResolutionPool {
+  var resolved: [ServiceKey: Any] = [:]
+  private var depth = 0
+
+  func resolve<T>(factory: () -> T) -> T {
+    depth = depth + 1
+    defer {
+      depth = depth - 1
+      if depth == 0 {
+        resolved.removeAll()
+      }
+    }
+    return factory()
   }
 }

@@ -15,10 +15,6 @@ protocol ServiceFactoryProtocol {
 }
 
 extension ServiceFactoryProtocol {
-  func makes<T>(_ type: T.Type) -> Bool {
-    type == ServiceType.self
-  }
-
   var wrapped: ServiceFactoryWrapper {
     ServiceFactoryWrapper(self)
   }

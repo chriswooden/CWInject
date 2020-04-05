@@ -25,24 +25,39 @@ class ContainerTests: XCTestCase {
     XCTAssertEqual(container.resolve(Service.self), serviceInstance)
   }
 
-  func test_resolve_propertyToPropertyInjection_resolvesBothDependencies() {
+  func test_resolve_circularDependencies_injectorToPropertyInjection_resolvesBothDependencies() {
     let container = Container()
-    let parent = Parent()
-    let child = Child()
-    container.register(Parent.self, factory: { resolver -> Parent in
-      parent
+    container.register(Parent.self, factory: { resolver in
+      Parent(child: resolver.resolve(Child.self))
+    })
+    container.register(Child.self, factory: { _ in
+      Child()
+    }, initCompleted: { child, resolver in
+      child.parent = resolver.resolve(Parent.self)
+    })
+
+    let resolvedParent = container.resolve(Parent.self)
+    XCTAssertNotNil(resolvedParent)
+    XCTAssertNotNil(resolvedParent.child)
+    XCTAssertEqual(resolvedParent, resolvedParent.child?.parent)
+  }
+
+  func test_resolve_circularDependencies_propertyToPropertyInjection_resolvesBothDependencies() {
+    let container = Container()
+    container.register(Parent.self, factory: { _ in
+      Parent()
     }, initCompleted: { parent, resolver in
       parent.child = resolver.resolve(Child.self)
     })
-    container.register(Child.self, factory: { _ -> Child in
-      child
+    container.register(Child.self, factory: { _ in
+      Child()
     }, initCompleted: { child, resolver in
       child.parent = resolver.resolve(Parent.self)
     })
     let resolvedParent = container.resolve(Parent.self)
-    let resolvedChild = container.resolve(Child.self)
-    XCTAssertEqual(resolvedParent.child, child)
-    XCTAssertEqual(resolvedChild.parent, parent)
+    XCTAssertNotNil(resolvedParent)
+    XCTAssertNotNil(resolvedParent.child)
+    XCTAssertEqual(resolvedParent, resolvedParent.child?.parent)
   }
 
   func test_resolve_multipleRegistrationsOfType_usesIDToDisambiguate() {
