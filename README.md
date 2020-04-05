@@ -100,11 +100,11 @@ class Dog: Animal {
 
 ## Circular Dependencies
 
-_Circular dependencies_ are dependencies of instances that depend on each other. To define circular dependencies in CWInject, one of the dependencies must be injected through a property.
+_Circular dependencies_ are dependencies of instances that depend on each other. To define circular dependencies in CWInject, both of the dependencies must be injected through a property.
 
 ### Property/Property Dependencies
 
-Similarly, assume that you have the following classes depending on each other, each via a property:
+Assume that you have the following classes depending on each other, each via a property:
 
 ```swift
 protocol ParentProtocol: AnyObject { }
@@ -135,7 +135,7 @@ container.register(ChildProtocol.self, factory: {
 })
 ```
 
-Here both of the depending properties must be specified in the `initCompleted` callback to avoid infinite recursion.
+Here both of the depending properties must be specified in the `initCompleted` callback to avoid infinite recursion and ensure both resolutions are complete.
 
 
 ### Initializer/Property Dependencies
