@@ -17,7 +17,7 @@ public class Container: Resolver {
   }
 
   @discardableResult public func register<T>(_ type: T.Type, id: String? = nil, instance: T) -> Container {
-    register(type, factory: { _ in instance })
+    register(type, id: id, factory: { _ in instance })
   }
 
   @discardableResult public func register<T>(_ type: T.Type, id: String? = nil, factory: @escaping (Resolver) -> T, initCompleted: ((T, Resolver) -> Void)? = nil) -> Container {
