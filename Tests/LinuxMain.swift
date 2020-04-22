@@ -1,7 +1,7 @@
 import XCTest
 
-import CWInjectPackageTests
+import CWInjectTests
 
 var tests = [XCTestCaseEntry]()
-tests += CWInjectPackageTests.allTests()
+tests += CWInjectTests.allTests()
 XCTMain(tests)

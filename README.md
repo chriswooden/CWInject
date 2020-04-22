@@ -1,4 +1,4 @@
-# CWInjectPackage
+# CWInject
 
 CWInject is a lightweight depedndency injection framework for Swift apps, allowing for loosely-coupled components, which can then be maintained and tested more easily.
 

@@ -6,7 +6,7 @@
 //  Copyright © 2020 Christopher Wooden. All rights reserved.
 //
 
-@testable import CWInjectPackage
+@testable import CWInject
 import Foundation
 import XCTest
 
