@@ -16,12 +16,8 @@ public class Container: Resolver {
     factories = [:]
   }
 
-  @discardableResult public func register<T>(_ type: T.Type, id: String? = nil, instance: T) -> Container {
-    register(type, id: id, factory: { _ in instance })
-  }
-
-  @discardableResult public func register<T>(_ type: T.Type, id: String? = nil, factory: @escaping (Resolver) -> T, initCompleted: ((T, Resolver) -> Void)? = nil) -> Container {
-    let key = ServiceKey(serviceType: type, id: id)
+  @discardableResult public func register<T>(_ type: T.Type, id: String? = nil, scope: ObjectScope = .prototype, factory: @escaping (Resolver) -> T, initCompleted: ((T, Resolver) -> Void)? = nil) -> Container {
+    let key = ServiceKey(serviceType: type, id: id, scope: scope)
     assert(factories[key] == nil, "Pre-existing service registration for type, supply a uniqie id to regitser multiple services for the same type")
     let newFactory = ServiceFactory<T>(make: { factory($0) }, made: { initCompleted?($0, $1) })
     factories[key] = newFactory.wrapped
@@ -29,8 +25,10 @@ public class Container: Resolver {
   }
 
   public func resolve<T>(_ type: T.Type, id: String? = nil) -> T {
-    let key = ServiceKey(serviceType: type, id: id)
-    guard let factory = factories[ServiceKey(serviceType: type, id: id)] else {
+    guard let key = (Array(factories.keys).first { $0.serviceType == T.self && $0.id == id }) else {
+      assert(false, "Cannot resolve dependency of type: \(T.self), id: \(String(describing: id)). Ensure a registration exists")
+    }
+    guard let factory = factories[key] else {
       assert(false, "Cannot resolve dependency of type: \(T.self), id: \(String(describing: id)). Ensure a registration exists")
     }
     return resolve(key: key, factory: factory)
@@ -62,7 +60,11 @@ private class ResolutionPool {
     defer {
       depth = depth - 1
       if depth == 0 {
-        resolved.removeAll()
+        resolved.forEach {
+          if $0.key.scope != .singleton {
+            resolved.removeValue(forKey: $0.key)
+          }
+        }
       }
     }
     return factory()

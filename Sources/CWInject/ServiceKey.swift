@@ -11,6 +11,7 @@ import Foundation
 struct ServiceKey {
   let serviceType: Any.Type
   let id: String?
+  let scope: ObjectScope
 }
 
 extension ServiceKey: Hashable {

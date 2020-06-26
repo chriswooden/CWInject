@@ -11,14 +11,13 @@ import Foundation
 import XCTest
 
 class ContainerTests: XCTestCase {
-  func test_resolve_registeredInstance_resolvesCorrectInstance() {
-    struct Shared: Equatable {}
-    let sharedInstance = Shared()
-    let container = Container().register(Shared.self, instance: sharedInstance)
-    XCTAssertEqual(container.resolve(Shared.self), sharedInstance)
+  func test_resolve_singleton_resolvesCorrectInstance() {
+    class Service: NSObject {}
+    let container = Container().register(Service.self, scope: .singleton, factory: { _ in Service() }, initCompleted: nil)
+    XCTAssertEqual(container.resolve(Service.self), container.resolve(Service.self))
   }
 
-  func test_resolve_registeredFactory_resolvesCorrectType() {
+  func test_resolve_prototype_resolvesCorrectType() {
     struct Service: Equatable {}
     let serviceInstance = Service()
     let container = Container().register(Service.self, factory: { _ in Service() }, initCompleted: nil)
