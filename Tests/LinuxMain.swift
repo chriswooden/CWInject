@@ -1,7 +1,7 @@
 import XCTest
 
-import CWInjectTests
+import NSInjectTests
 
 var tests = [XCTestCaseEntry]()
-tests += CWInjectTests.allTests()
+tests += NSInjectTests.allTests()
 XCTMain(tests)

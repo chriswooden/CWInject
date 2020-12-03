@@ -1,12 +1,4 @@
-//
-//  ContainerTests.swift
-//  CWInjectTests
-//
-//  Created by Christopher Wooden on 04/04/2020.
-//  Copyright © 2020 Christopher Wooden. All rights reserved.
-//
-
-@testable import CWInject
+@testable import NSInject
 import Foundation
 import XCTest
 
