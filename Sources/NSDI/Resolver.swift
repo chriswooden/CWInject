@@ -1,11 +1,11 @@
 import Foundation
 
 public protocol Resolver {
-  func resolve<T>(_ type: T.Type, id: String?) -> T
+  func resolve<T>(_ type: T.Type, id: String?) throws -> T
 }
 
 public extension Resolver {
-  func resolve<T>(_ type: T.Type, id: String? = nil) -> T {
-    resolve(type, id: id)
+  func resolve<T>(_ type: T.Type, id: String? = nil) throws -> T {
+    try resolve(type, id: id)
   }
 }

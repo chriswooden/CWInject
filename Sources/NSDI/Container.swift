@@ -1,12 +1,10 @@
 import Foundation
 
 public class Container: Resolver {
-  private var factories: [ServiceKey: ServiceFactoryWrapper]
+  private var factories: [ServiceKey: ServiceFactoryWrapper] = [:]
   private var resolutionPool = ResolutionPool()
 
-  public init() {
-    factories = [:]
-  }
+  public init() {}
 
   @discardableResult public func register<T>(_ type: T.Type, id: String? = nil, scope: ObjectScope = .prototype, factory: @escaping (Resolver) -> T, initCompleted: ((T, Resolver) -> Void)? = nil) -> Container {
     let key = ServiceKey(serviceType: type, id: id, scope: scope)
@@ -16,12 +14,14 @@ public class Container: Resolver {
     return self
   }
 
-  public func resolve<T>(_ type: T.Type, id: String? = nil) -> T {
+  public func resolve<T>(_ type: T.Type, id: String? = nil) throws -> T {
     guard let key = (Array(factories.keys).first { $0.serviceType == T.self && $0.id == id }) else {
       assert(false, "Cannot resolve dependency of type: \(T.self), id: \(String(describing: id)). Ensure a registration exists")
+      throw ResolutionError.missingRegistry
     }
     guard let factory = factories[key] else {
       assert(false, "Cannot resolve dependency of type: \(T.self), id: \(String(describing: id)). Ensure a registration exists")
+      throw ResolutionError.missingRegistry
     }
     return resolve(key: key, factory: factory)
   }
